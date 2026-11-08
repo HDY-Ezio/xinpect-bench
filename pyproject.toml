@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xinpect-bench"
+version = "0.1.0"
+description = "Score any code scanner against the OWASP Benchmark methodology, from SARIF output."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Xinpect", url = "https://xinpect.xingwangzhineng.com" }]
+keywords = ["sast", "owasp-benchmark", "sarif", "static-analysis", "false-positive"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Security",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.urls]
+Homepage = "https://xinpect.xingwangzhineng.com"
+Methodology = "https://github.com/HDY-Ezio/xinpect-bench/blob/main/docs/methodology.md"
+
+[project.scripts]
+xinpect-bench = "xinpect_bench.cli:main"
+
+[tool.setuptools]
+packages = ["xinpect_bench", "xinpect_bench.adapters"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

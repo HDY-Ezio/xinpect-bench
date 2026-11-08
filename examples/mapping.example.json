@@ -1,0 +1,52 @@
+{
+  "_comment": "规则 ID -> OWASP 类别映射示例。必须按被测工具的实际 ruleId 校准，否则分数没有意义。优先级：rules（精确）> patterns（glob，按顺序）> keywords（子串，兜底）。",
+  "rules": {
+    "java/sql-injection": "sqli",
+    "java/path-injection": "pathtraver",
+    "java/xss": "xss",
+    "java/command-line-injection": "cmdi",
+    "java/weak-cryptographic-algorithm": "crypto",
+    "java/weak-random": "weakrand",
+    "java/ldap-injection": "ldapi",
+    "java/xpath-injection": "xpathi",
+    "java/trust-boundary-violation": "trustbound",
+    "java/insecure-cookie": "securecookie",
+    "java/unvalidated-url-redirection": "redirect",
+    "java/unsafe-deserialization": "deserialization",
+    "java/insecure-hash": "hash"
+  },
+  "patterns": [
+    {"match": "*sql-injection*", "category": "sqli"},
+    {"match": "*sqli*", "category": "sqli"},
+    {"match": "*path-traversal*", "category": "pathtraver"},
+    {"match": "*path-injection*", "category": "pathtraver"},
+    {"match": "*xss*", "category": "xss"},
+    {"match": "*cross-site-scripting*", "category": "xss"},
+    {"match": "*command-injection*", "category": "cmdi"},
+    {"match": "*os-command*", "category": "cmdi"},
+    {"match": "*weak-hash*", "category": "hash"},
+    {"match": "*insecure-hash*", "category": "hash"},
+    {"match": "*md5*", "category": "hash"},
+    {"match": "*crypto*", "category": "crypto"},
+    {"match": "*weakrand*", "category": "weakrand"},
+    {"match": "*weak-random*", "category": "weakrand"},
+    {"match": "*ldap*", "category": "ldapi"},
+    {"match": "*xpath*", "category": "xpathi"},
+    {"match": "*trust-boundary*", "category": "trustbound"},
+    {"match": "*cookie*", "category": "securecookie"},
+    {"match": "*redirect*", "category": "redirect"},
+    {"match": "*deserial*", "category": "deserialization"}
+  ],
+  "keywords": [
+    {"match": "sql injection", "category": "sqli"},
+    {"match": "sql 注入", "category": "sqli"},
+    {"match": "path traversal", "category": "pathtraver"},
+    {"match": "路径遍历", "category": "pathtraver"},
+    {"match": "cross-site scripting", "category": "xss"},
+    {"match": "跨站脚本", "category": "xss"},
+    {"match": "command injection", "category": "cmdi"},
+    {"match": "命令注入", "category": "cmdi"},
+    {"match": "trust boundary", "category": "trustbound"},
+    {"match": "信任边界", "category": "trustbound"}
+  ]
+}

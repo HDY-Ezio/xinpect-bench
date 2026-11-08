@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.idea/
+.vscode/
+.DS_Store
+
+# 题库不随仓库走（几百 MB）
+BenchmarkJava/
+BenchmarkPython/
+
+# 本地跑出来的结果
+result*.json
+result*.md
+*.sarif
+!examples/*.sarif

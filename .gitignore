@@ -19,3 +19,9 @@ result*.json
 result*.md
 *.sarif
 !examples/*.sarif
+
+# 例外：bench/ 下是我们主动发布出去的证据，必须进仓库。
+# 这几行曾经漏过，导致 *.sarif 和 result*.json 被一起挡掉，
+# 仓库里少了两个文件而 CI 仍然是绿的（守卫当时把「文件缺失」当成跳过）。
+!bench/*.sarif
+!bench/result-*.json

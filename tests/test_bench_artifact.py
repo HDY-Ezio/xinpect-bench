@@ -35,8 +35,20 @@ RESULT_TXT = BENCH / "result-2026-11-08.txt"
 RESULT_JSON = BENCH / "result-2026-11-08.json"
 TRANSFORM = BENCH / "collect.py"
 
-MISSING = [p.name for p in (SARIF, RAW_GZ, MAPPING, RESULT_TXT, RESULT_JSON, TRANSFORM)
-           if not p.exists()]
+FILES = (SARIF, RAW_GZ, MAPPING, RESULT_TXT, RESULT_JSON, TRANSFORM)
+HAVE_BENCH = BENCH.is_dir()
+MISSING = [p.name for p in FILES if not p.exists()]
+
+# A missing file used to make this whole module skip, and the suite stayed green
+# while two published files were silently excluded by .gitignore. So: no bench/
+# directory at all (a vendored copy of the tool) skips; bench/ present but
+# incomplete is a failure.
+if HAVE_BENCH and MISSING:
+    raise AssertionError(
+        "bench/ exists but these published files are missing: %s. Either they were "
+        "never committed (check .gitignore) or the artifact is incomplete. A missing "
+        "file must not quietly switch this check off." % ", ".join(MISSING)
+    )
 
 
 def _load_transform_module():
@@ -46,7 +58,7 @@ def _load_transform_module():
     return mod
 
 
-@unittest.skipIf(MISSING, "bench artifact not present: %s" % ", ".join(MISSING))
+@unittest.skipUnless(HAVE_BENCH, "bench/ artifact directory not present (vendored copy)")
 class TestBenchArtifact(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

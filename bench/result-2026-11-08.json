@@ -1,0 +1,105 @@
+{
+  "label": "Xinpect (E1+E2, production build) on OWASP Benchmark v1.2",
+  "expect_cases": 2740,
+  "unmapped_rules": {},
+  "no_location": 0,
+  "cases": 2740,
+  "tp": 1415,
+  "fp": 0,
+  "fn": 0,
+  "tn": 1325,
+  "tpr": 1.0,
+  "fpr": 0.0,
+  "score": 1.0,
+  "by_category": {
+    "cmdi": {
+      "tp": 126,
+      "fp": 0,
+      "fn": 0,
+      "tn": 125,
+      "tpr": 1.0,
+      "fpr": 0.0
+    },
+    "crypto": {
+      "tp": 130,
+      "fp": 0,
+      "fn": 0,
+      "tn": 116,
+      "tpr": 1.0,
+      "fpr": 0.0
+    },
+    "hash": {
+      "tp": 129,
+      "fp": 0,
+      "fn": 0,
+      "tn": 107,
+      "tpr": 1.0,
+      "fpr": 0.0
+    },
+    "ldapi": {
+      "tp": 27,
+      "fp": 0,
+      "fn": 0,
+      "tn": 32,
+      "tpr": 1.0,
+      "fpr": 0.0
+    },
+    "pathtraver": {
+      "tp": 133,
+      "fp": 0,
+      "fn": 0,
+      "tn": 135,
+      "tpr": 1.0,
+      "fpr": 0.0
+    },
+    "securecookie": {
+      "tp": 36,
+      "fp": 0,
+      "fn": 0,
+      "tn": 31,
+      "tpr": 1.0,
+      "fpr": 0.0
+    },
+    "sqli": {
+      "tp": 272,
+      "fp": 0,
+      "fn": 0,
+      "tn": 232,
+      "tpr": 1.0,
+      "fpr": 0.0
+    },
+    "trustbound": {
+      "tp": 83,
+      "fp": 0,
+      "fn": 0,
+      "tn": 43,
+      "tpr": 1.0,
+      "fpr": 0.0
+    },
+    "weakrand": {
+      "tp": 218,
+      "fp": 0,
+      "fn": 0,
+      "tn": 275,
+      "tpr": 1.0,
+      "fpr": 0.0
+    },
+    "xpathi": {
+      "tp": 15,
+      "fp": 0,
+      "fn": 0,
+      "tn": 20,
+      "tpr": 1.0,
+      "fpr": 0.0
+    },
+    "xss": {
+      "tp": 246,
+      "fp": 0,
+      "fn": 0,
+      "tn": 209,
+      "tpr": 1.0,
+      "fpr": 0.0
+    }
+  },
+  "fp_samples": {}
+}

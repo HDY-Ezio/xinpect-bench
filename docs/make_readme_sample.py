@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""给 README 造一段「真实工具输出」的示例：虚构小数据集，数字由 xinpect-bench 自己算出来。
+"""Produce the "real tool output" block shown in the READMEs: a made-up mini corpus,
+scored by xinpect-bench itself.
 
-目的：README 顶部示例必须能做到两件事
-1) 每一行的 TPR/FPR 和它自己的 TP/FP/FN/TN 对得上；
-2) 合计行等于上面各行相加，且 TPR/FPR/score 由同一组整数算出。
-手写这些数字迟早出错，所以这里真跑一遍。
+Why run it instead of writing the numbers by hand: the sample at the top of the
+README has to satisfy two things
+1) every row's TPR/FPR is consistent with that row's own TP/FP/FN/TN;
+2) the total row equals the sum of the rows, and TPR/FPR/score come from those
+   same integers.
+Handwritten numbers drift. So this actually runs the CLI.
+
+tests/test_readme_sample.py re-runs this and fails if either README's block no
+longer matches the real output.
 """
 import csv
 import json
@@ -17,8 +23,8 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-# 目标：三个类别，合计 TP=25 FP=5 FN=1 TN=64（共 95 个用例）
-# 类别          真漏洞(TP+FN)  干净(FP+TN)   设 TP   FP
+# Target totals: 95 cases, TP=23 FP=5 FN=3 TN=64.
+# category      real (TP+FN)  clean (FP+TN)   want TP   want FP
 PLAN = [
     ("cmdi", 12, 22, 10, 2),
     ("pathtraver", 8, 24, 8, 3),
@@ -45,7 +51,8 @@ def main():
             rows.append((name, cat, "false", "CWE-000"))
         for _ in range(fp):
             detections.append("BenchmarkTest%05d" % (n - _))
-    # 上面 fp 取自该类别末尾的干净用例，确保落在正确类别
+    # The FP cases above are taken from the tail of each category's clean cases,
+    # so each false positive lands in the category it was reported as.
     with open(os.path.join(tmp, "expectedresults-toy.csv"), "w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
         w.writerow(["# test name", "category", "real vulnerability", "cwe"])

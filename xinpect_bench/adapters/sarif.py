@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-"""SARIF 2.1.0 读取与「规则 -> OWASP 类别」映射。
+"""SARIF 2.1.0 reading, and "rule -> OWASP category" mapping.
 
-为什么用 SARIF：CodeQL、Semgrep、SonarQube、Bandit、gosec、ESLint 等都能导出
-SARIF。用行业标准格式当接口，评测工具才可能被别人拿去测自己的扫描器 ——
-如果只认某一家私有 JSON，这个工具就只对作者自己有用。
+Why SARIF: CodeQL, Semgrep, SonarQube, Bandit, gosec and ESLint can all emit it.
+A benchmark tool speaks the industry standard so that other people can point it at
+their own scanner -- a tool that only understands one vendor's private JSON is
+useful to its author and nobody else.
 
-未映射的规则不会被静默丢弃，而是统计出来单独汇报：映射覆盖率低，分数就没有
-可比性，必须让人看见。
+Unmapped rules are never dropped silently: they are counted and reported on their
+own line. Low mapping coverage makes a score incomparable, so it has to be visible.
 """
 from __future__ import annotations
 
@@ -34,7 +35,7 @@ class Mapping:
             return cls()
         path = Path(path)
         if not path.is_file():
-            raise SarifError("映射文件不存在: %s" % path)
+            raise SarifError("mapping file does not exist: %s" % path)
         data = json.loads(path.read_text(encoding="utf-8"))
         m = cls()
         m.rules = {str(k).lower(): str(v) for k, v in (data.get("rules") or {}).items()}
@@ -61,13 +62,13 @@ class Mapping:
 def load_sarif(path: Path) -> dict:
     path = Path(path)
     if not path.is_file():
-        raise SarifError("SARIF 文件不存在: %s" % path)
+        raise SarifError("SARIF file does not exist: %s" % path)
     try:
         data = json.loads(path.read_text(encoding="utf-8", errors="replace"))
     except json.JSONDecodeError as e:
-        raise SarifError("SARIF 不是合法 JSON (%s): %s" % (path, e))
+        raise SarifError("SARIF is not valid JSON (%s): %s" % (path, e))
     if not isinstance(data, dict) or "runs" not in data:
-        raise SarifError("不是 SARIF 2.x 结构（缺 runs）: %s" % path)
+        raise SarifError("not a SARIF 2.x document (no runs key): %s" % path)
     return data
 
 
@@ -84,7 +85,7 @@ class Extraction:
 
 
 def extract_detections(sarif: dict, mapping: Mapping) -> Extraction:
-    """把 SARIF 结果折算成「用例名 -> 检出的漏洞类别集合」。"""
+    """Fold SARIF results into "case name -> set of detected categories"."""
     out = Extraction()
     for run in (sarif.get("runs") or []):
         for result in (run.get("results") or []):

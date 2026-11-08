@@ -1,5 +1,7 @@
 # xinpect-bench
 
+[![CI](https://github.com/HDY-Ezio/xinpect-bench/actions/workflows/ci.yml/badge.svg)](https://github.com/HDY-Ezio/xinpect-bench/actions/workflows/ci.yml)
+
 **拿 OWASP Benchmark 的口径给任意代码扫描器打分——只要它能导出 SARIF。**
 
 [English](README.md) · [方法学](docs/methodology.md)
@@ -13,6 +15,7 @@ git clone https://github.com/HDY-Ezio/xinpect-bench && cd xinpect-bench
 pip install -e .                    # 还没上 PyPI，见下面「安装」
 xinpect-bench score --owasp-dir ./BenchmarkJava --sarif ./semgrep.sarif \
                     --mapping mapping.json --expect-cases 2740
+# BenchmarkJava、semgrep.sarif、mapping.json 要你自己准备，见下面几步。
 ```
 
 下面这段是**这个工具真跑出来的输出**，跑的是一个虚构的小数据集
@@ -21,7 +24,7 @@ xinpect-bench score --owasp-dir ./BenchmarkJava --sarif ./semgrep.sarif \
 
 ```
 ==========================================================================
-OWASP Benchmark 评测结果  ·  demo.sarif
+OWASP Benchmark results  ·  demo.sarif
 ==========================================================================
 category             TP     FP     FN     TN |     TPR     FPR
 --------------------------------------------------------------------------
@@ -29,9 +32,12 @@ cmdi                 10      2      2     20 |   83.3%    9.1%
 pathtraver            8      3      0     21 |  100.0%   12.5%
 sqli                  5      0      1     23 |   83.3%    0.0%
 --------------------------------------------------------------------------
-总体: TP=23 FP=5 FN=3 TN=64
+Overall: TP=23 FP=5 FN=3 TN=64
 TPR=88.5%  FPR=7.2%  score=81.2%
 ```
+
+（命令行输出统一用英文——这个工具是给国际同行拿去测自家扫描器的，输出标签就是
+`category / TP / FP / FN / TN / TPR / FPR / score` 这几个通用词，没有第二套翻译。）
 
 每一行的 TPR/FPR 都由这一行自己的 TP/FP/FN/TN 算出，合计行是各行相加。
 同行发出来的表，恰恰最常在这两处对不上。
@@ -56,7 +62,7 @@ TPR=88.5%  FPR=7.2%  score=81.2%
 ```bash
 git clone https://github.com/HDY-Ezio/xinpect-bench && cd xinpect-bench
 pip install -e .                          # Python 3.9+
-python -m unittest discover -s tests      # 22 个测试，不需要联网
+python -m unittest discover -s tests      # 不需要联网
 ```
 
 等 0.1.0 正式发到 PyPI 之后，`pip install xinpect-bench` 才作数；
@@ -143,8 +149,9 @@ xinpect-bench run --owasp-dir ./BenchmarkJava \
 TP=1415  FP=0  FN=0  TN=1325      TPR=100.0%  FPR=0.0%  score=100.0%
 ```
 
-由本工具从导出的 SARIF 算出。也就是说——**你可以反过来测我们**：用 `xinpect-bench` 跑一遍我们的产品，你的数字为准。
-一个能被拿来测作者本人的基准，才值得信。
+**这句话要按「我们的说法」读，不是「你能复算的结果」。** 它是我们自己的基准脚本逐用例跑出来的，用的是本工具实现的同一套口径；那份 SARIF 运行结果我们还没公开，所以这一行现在只能靠我们自证——而「不要靠作者自证」正是这个仓库存在的理由。
+
+能查的地方在这里：我们的扫描器能导出 SARIF（`xinpect scan --format sarif`），本工具读 SARIF，所以这次测量你可以在自己手上重跑一遍，不用问我们要任何东西。跑出来**你的数字为准**。
 
 那个 0.0% 是 Java 公开题库上的结果，不是对你仓库的承诺。所以我们免费那档一直叫**初筛**，不叫完整报告。
 

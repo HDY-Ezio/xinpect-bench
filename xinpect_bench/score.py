@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 """Scoring core for OWASP Benchmark style evaluation.
 
-设计原则（每条都来自实测踩过的坑，见 docs/methodology.md）：
+Design rules, each one the result of a failure mode seen in the wild
+(see docs/methodology.md):
 
-1. 分数只能由「逐用例的判定结果」算出来，不能由汇总数倒推。
-2. 请求/解析失败必须显式计入 failed，绝不允许静默跳过 —— 跳过会让
-   分母变小、分数变高，这是 SAST 评测里最常见的假绿。
-3. 题库漂移（用例数与期望值不符）直接拒绝出分。
+1. A score may only be computed from per-case verdicts, never back-derived from
+   an aggregate.
+2. A request or parse failure must be counted explicitly. Never skip silently --
+   skipping shrinks the denominator and raises the score, which is the most
+   common form of fake green in SAST benchmarking.
+3. Corpus drift (case count disagrees with the expected value) refuses to score.
 """
 from __future__ import annotations
 
@@ -16,7 +19,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Case:
-    """一个测试用例：期望什么、实际检出什么。"""
+    """One test case: what is expected, and what was actually detected."""
 
     name: str
     category: str
@@ -70,7 +73,7 @@ class ScoreReport:
 
     @property
     def score(self) -> float:
-        """OWASP Benchmark 的 score = TPR - FPR。范围 -1.0 ~ 1.0。"""
+        """OWASP Benchmark convention: score = TPR - FPR, range -1.0 to 1.0."""
         return self.tpr - self.fpr
 
     def as_dict(self) -> dict:
@@ -86,15 +89,18 @@ class ScoreReport:
 
 
 def score_cases(cases: list[Case], strict_fp: bool = False) -> ScoreReport:
-    """按 OWASP 口径逐用例打分。
+    """Score per case, using the OWASP convention.
 
-    strict_fp=False（默认，OWASP 官方口径）：只在「漏报了该用例对应的漏洞类别」
-    时才算命中；non-vulnerable 用例报对了那一类才计 FP。
-    strict_fp=True：non-vulnerable 用例只要报出任何类别就计 FP。更接近生产体感，
-    但会惩罚「同一文件里报了个别的问题」，和其他工具对比时要说清用的哪套口径。
+    strict_fp=False (default, the official OWASP convention): a real case is a hit
+    only if the finding lands in that case's own category; a non-vulnerable case
+    counts as FP only if it was flagged with that same category.
+    strict_fp=True: any finding on a non-vulnerable case counts as FP. Closer to how
+    production feels, but it punishes "reported something else in the same file" --
+    say which convention you used when comparing against other tools.
     """
     if not cases:
-        raise ValueError("没有用例可打分：检查期望文件与 SARIF 是否对不上")
+        raise ValueError("no cases to score: check that the expected-results file "
+                         "and the SARIF actually refer to the same corpus")
 
     stats: dict[str, CategoryStats] = defaultdict(CategoryStats)
     fp_samples: dict[str, list[str]] = defaultdict(list)
@@ -126,7 +132,7 @@ def score_cases(cases: list[Case], strict_fp: bool = False) -> ScoreReport:
 
 
 def apply_detections(cases: list[Case], detected: dict[str, set[str]]) -> list[Case]:
-    """把「用例名 -> 检出的类别集合」贴到用例上；缺失的用例视为零检出。"""
+    """Attach "case name -> detected categories" to the cases; a missing case means zero findings."""
     for c in cases:
         c.detected = set(detected.get(c.name, ()))
     return cases

@@ -118,7 +118,15 @@ v1.2 corpus:
 TP=1415  FP=0  FN=0  TN=1325      TPR=100.0%  FPR=0.0%  score=100.0%
 ```
 
-Produced by this tool from the exported SARIF. The corpus version and case count
-are pinned at 2,740. Because the tool is public and the corpus is public, this
-claim is checkable by anyone — including the parts we would rather not show.
-That is the point.
+Produced by our own benchmark harness, per case, under the convention this tool
+implements. The corpus version and case count are pinned at 2,740.
+
+Be exact about what this is and is not: it is a **claim we make**, not a
+reproduction you can rerun from files in this repository. We have not published
+the SARIF run behind it, so the line above rests on our word alone.
+
+What makes it checkable anyway: our scanner emits SARIF (`xinpect scan --format
+sarif`) and this tool reads SARIF, so the measurement can be repeated on your
+side without asking us for anything. Because both the tool and the corpus are
+public, the check is available to anyone — including the parts we would rather
+not show. That is the point.

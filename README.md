@@ -10,7 +10,8 @@ numbers everyone argues about: **TP / FP / FN / TN, TPR, FPR, and per-category
 score** — with the failure modes that make SAST numbers fake, turned into hard errors.
 
 ```bash
-pip install xinpect-bench
+git clone https://github.com/HDY-Ezio/xinpect-bench && cd xinpect-bench
+pip install -e .                   # not on PyPI yet, see Install below
 xinpect-bench score --owasp-dir ./BenchmarkJava --sarif ./semgrep.sarif \
                     --mapping mapping.json --expect-cases 2740
 ```
@@ -55,17 +56,17 @@ vendor's private JSON is a marketing asset, not a benchmark.
 
 ## Install
 
-```bash
-pip install xinpect-bench          # Python 3.9+, no third-party dependencies
-```
-
-From source:
+**Not on PyPI yet.** Install from source — one command, no third-party dependencies:
 
 ```bash
 git clone https://github.com/HDY-Ezio/xinpect-bench && cd xinpect-bench
-pip install -e .
+pip install -e .                          # Python 3.9+
 python -m unittest discover -s tests      # 22 tests, no network needed
 ```
+
+`pip install xinpect-bench` will work once 0.1.0 is published; until then the
+clone is the only path that actually runs. Writing the one-liner before it works
+would be exactly the kind of claim this tool is built to catch.
 
 ## Get the benchmark data
 

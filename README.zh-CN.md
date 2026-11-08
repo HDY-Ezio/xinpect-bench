@@ -9,7 +9,8 @@
 **TP / FP / FN / TN、TPR、FPR、按漏洞类别的得分**。
 
 ```bash
-pip install xinpect-bench
+git clone https://github.com/HDY-Ezio/xinpect-bench && cd xinpect-bench
+pip install -e .                    # 还没上 PyPI，见下面「安装」
 xinpect-bench score --owasp-dir ./BenchmarkJava --sarif ./semgrep.sarif \
                     --mapping mapping.json --expect-cases 2740
 ```
@@ -50,17 +51,17 @@ TPR=88.5%  FPR=7.2%  score=81.2%
 
 ## 安装
 
-```bash
-pip install xinpect-bench            # Python 3.9+，无第三方依赖
-```
-
-从源码：
+**还没发到 PyPI。** 从源码装，一条命令，没有任何第三方依赖：
 
 ```bash
 git clone https://github.com/HDY-Ezio/xinpect-bench && cd xinpect-bench
-pip install -e .
-python -m unittest discover -s tests     # 22 个测试，不需要联网
+pip install -e .                          # Python 3.9+
+python -m unittest discover -s tests      # 22 个测试，不需要联网
 ```
+
+等 0.1.0 正式发到 PyPI 之后，`pip install xinpect-bench` 才作数；
+在那之前只有 clone 这条路真能跑。先把跑不通的一行写在最前面，
+恰好是这个工具专门要抓的那种话。
 
 ## 准备题库
 

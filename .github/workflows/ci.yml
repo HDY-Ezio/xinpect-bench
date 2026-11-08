@@ -6,7 +6,9 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # 3.9 必须继续测（pyproject 声明 requires-python >=3.9），但 ubuntu-latest
+    # 已经不再预装 3.9，实测直接判红。把运行环境钉在 22.04，三个版本都拿得到。
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -16,7 +18,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install the package
+        run: python -m pip install --upgrade pip && python -m pip install -e .
       - name: Run tests
         run: python -m unittest discover -s tests -v
       - name: Check the CLI starts
         run: python -m xinpect_bench.cli --version
+      - name: Score a toy corpus end to end
+        run: python docs/make_readme_sample.py

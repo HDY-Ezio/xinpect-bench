@@ -1,3 +1,9 @@
 * text=auto eol=lf
 *.png binary
 *.jpg binary
+
+# The published benchmark artifact is compared byte for byte by
+# tests/test_bench_artifact.py, so its line endings must not be rewritten.
+*.sarif text eol=lf
+*.jsonl text eol=lf
+*.gz binary

@@ -169,21 +169,29 @@ Details and the reasoning behind each guard: [`docs/methodology.md`](docs/method
 
 We build a commercial scanner, so our number belongs here with the same caveats
 as anyone else's. On OWASP Benchmark v1.2 (2,740 cases, our E1 pattern engine +
-E2 semantic engine, production build):
+E2 semantic engine, production build 5.163.0, scanned 2026-11-08):
 
 ```
 TP=1415  FP=0  FN=0  TN=1325      TPR=100.0%  FPR=0.0%  score=100.0%
 ```
 
-**Read that as our claim, not as a reproduction.** It was measured by our own
-benchmark harness, per case, with the convention this tool implements — we have
-not published the SARIF run that would let you recompute the line yourself, so
-you are taking our word for it, which is the thing this repository is built to
-stop you from doing.
+**This one you can check yourself.** [`bench/`](bench/) holds the whole trail: the
+SARIF the scan produced, the raw issues it was built from, the rule→category
+mapping, and the verbatim console output. Two commands, public corpus, no
+hand-waving:
 
-What makes it checkable: our scanner can emit SARIF (`xinpect scan --format
-sarif`), and this tool reads SARIF. So the run is reproducible on your side, and
-when it is, **your number wins.**
+```bash
+git clone https://github.com/OWASP-Benchmark/BenchmarkJava
+xinpect-bench score --owasp-dir ../BenchmarkJava \
+  --sarif bench/xinpect-2026-11-08.sarif --mapping bench/mapping.json \
+  --expect-cases 2740
+```
+
+If you do not want to trust our transform either: `bench/collect.py sarif` rebuilds
+that same SARIF from the published raw issues, byte for byte, with no network and
+no product. [`bench/README.md`](bench/README.md) spells out what the transform does
+— including the two places where a choice could tilt a score, and the count of how
+often each was used in this run.
 
 That 0.0% FPR is a Java-benchmark result on a public corpus. It is not a promise
 about your repository — which is why our free tier is called a **triage**

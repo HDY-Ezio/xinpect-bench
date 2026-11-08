@@ -143,15 +143,25 @@ xinpect-bench run --owasp-dir ./BenchmarkJava \
 
 ## 我们自己的成绩
 
-我们做商业扫描器，所以我们的数字也放在这里，跟所有人的数字吃同一套质疑。OWASP Benchmark v1.2 全量（2,740 个用例，E1+E2 引擎，生产版本）：
+我们做商业扫描器，所以我们的数字也放在这里，跟所有人的数字吃同一套质疑。OWASP Benchmark v1.2 全量（2,740 个用例，E1+E2 引擎，生产版本 5.163.0，扫描于 2026-11-08）：
 
 ```
 TP=1415  FP=0  FN=0  TN=1325      TPR=100.0%  FPR=0.0%  score=100.0%
 ```
 
-**这句话要按「我们的说法」读，不是「你能复算的结果」。** 它是我们自己的基准脚本逐用例跑出来的，用的是本工具实现的同一套口径；那份 SARIF 运行结果我们还没公开，所以这一行现在只能靠我们自证——而「不要靠作者自证」正是这个仓库存在的理由。
+**这一次你自己能查。** [`bench/`](bench/) 里是完整链条：扫描产出的 SARIF、拼出这个 SARIF 的原始明细、
+规则到类别的映射表、以及原样的控制台输出。两条命令，公开题库，不用听我们的一面之词：
 
-能查的地方在这里：我们的扫描器能导出 SARIF（`xinpect scan --format sarif`），本工具读 SARIF，所以这次测量你可以在自己手上重跑一遍，不用问我们要任何东西。跑出来**你的数字为准**。
+```bash
+git clone https://github.com/OWASP-Benchmark/BenchmarkJava
+xinpect-bench score --owasp-dir ../BenchmarkJava \
+  --sarif bench/xinpect-2026-11-08.sarif --mapping bench/mapping.json \
+  --expect-cases 2740
+```
+
+连我们的转换过程都不想信？`bench/collect.py sarif` 能从公开的原始明细把同一个 SARIF 重建出来，
+一字不差，不联网、不用我们的产品。[`bench/README.md`](bench/README.md) 写清了转换到底做了什么——
+包括两处「可以左右分数」的选择，以及这次实际各用了几次。
 
 那个 0.0% 是 Java 公开题库上的结果，不是对你仓库的承诺。所以我们免费那档一直叫**初筛**，不叫完整报告。
 

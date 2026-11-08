@@ -1,0 +1,54 @@
+{
+  "_comment": [
+    "Rule ID -> OWASP Benchmark category. Keys are lower-case on purpose:",
+    "xinpect-bench lowercases rule IDs before matching, so this file is not",
+    "case-sensitive.",
+    "",
+    "Rules that say something true about the code but mean nothing under the",
+    "OWASP Benchmark categories (resource leaks, swallowed exceptions, NPEs,",
+    "null checks) map to the sentinel `non-owasp`. That is NOT the same as",
+    "filtering them out: they are still counted as results, still reported,",
+    "and they can never match a case's category, so they neither earn a true",
+    "positive nor create a false positive. Removing them from the SARIF would",
+    "have been a hidden filter -- and hiding a filter is the failure this",
+    "whole tool exists to catch.",
+    "",
+    "E3-TAINT-JAVA-001 gets a /sink_kind suffix because one check ID covers",
+    "nine vulnerability types. A taint finding without a sink_kind is mapped",
+    "to non-owasp rather than guessed at.",
+    "E2-SEC-JCRP-001 is split into /hash and /crypto, decided by whether the",
+    "finding is about MessageDigest or Cipher."
+  ],
+  "rules": {
+    "e3-taint-java-001/sql_injection": "sqli",
+    "e3-taint-java-001/xss": "xss",
+    "e3-taint-java-001/path_traversal": "pathtraver",
+    "e3-taint-java-001/command_injection": "cmdi",
+    "e3-taint-java-001/xpath_injection": "xpathi",
+    "e3-taint-java-001/ldap_injection": "ldapi",
+    "e3-taint-java-001/deserialization": "deserialization",
+    "e3-taint-java-001/trust_boundary": "trustbound",
+    "e3-taint-java-001/ssrf": "non-owasp",
+    "e3-taint-java-001/unspecified": "non-owasp",
+
+    "e2-sec-jcrp-001/hash": "hash",
+    "e2-sec-jcrp-001/crypto": "crypto",
+    "e2-sec-jcrp-001/unspecified": "non-owasp",
+
+    "e2-sec-jvpt-001": "pathtraver",
+    "e2-sec-jvxs-001": "xss",
+    "e2-sec-jv-002": "sqli",
+    "e2-sec-jv-010": "weakrand",
+    "e2-sec-jvsc-001": "securecookie",
+    "e2-sec-rnd-001": "weakrand",
+
+    "e2-sec-jrlc-001": "non-owasp",
+    "e2-sec-jv-040": "non-owasp",
+    "e3-perf-java-sec-001": "non-owasp",
+    "e3-perf-java-np2-001": "non-owasp",
+    "e3-perf-java-swe-001": "non-owasp",
+    "e3-perf-java-lef-001": "non-owasp",
+    "e3-perf-java-urt-001": "non-owasp",
+    "e1-cor-jfrt-001": "non-owasp"
+  }
+}

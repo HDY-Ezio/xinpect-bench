@@ -118,15 +118,20 @@ v1.2 corpus:
 TP=1415  FP=0  FN=0  TN=1325      TPR=100.0%  FPR=0.0%  score=100.0%
 ```
 
-Produced by our own benchmark harness, per case, under the convention this tool
-implements. The corpus version and case count are pinned at 2,740.
+Produced by a real scan of the full corpus on 2026-11-08 (build 5.163.0), from
+per-case issues exported to SARIF and scored with this tool. The corpus version
+and case count are pinned at 2,740.
 
-Be exact about what this is and is not: it is a **claim we make**, not a
-reproduction you can rerun from files in this repository. We have not published
-the SARIF run behind it, so the line above rests on our word alone.
+The artifacts are published, so this is not a claim you have to take on faith:
 
-What makes it checkable anyway: our scanner emits SARIF (`xinpect scan --format
-sarif`) and this tool reads SARIF, so the measurement can be repeated on your
-side without asking us for anything. Because both the tool and the corpus are
-public, the check is available to anyone — including the parts we would rather
-not show. That is the point.
+- `bench/xinpect-2026-11-08.sarif` — what the scan produced, 2,573 results;
+- `bench/raw-2026-11-08.jsonl.gz` — the raw per-case issues, before any transform;
+- `bench/mapping.json` — rule ID → category, every rule used is covered;
+- `bench/result-2026-11-08.txt` — verbatim output of the scoring command;
+- `bench/collect.py` — the transform, so the step that could tilt a score is
+  auditable and rerunnable without our product.
+
+Two commands reproduce the number from the public corpus; see
+[`../bench/README.md`](../bench/README.md). Because both the tool and the corpus
+are public, the check is available to anyone — including the parts we would
+rather not show. That is the point.

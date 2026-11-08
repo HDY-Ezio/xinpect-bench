@@ -15,20 +15,26 @@ xinpect-bench score --owasp-dir ./BenchmarkJava --sarif ./semgrep.sarif \
                     --mapping mapping.json --expect-cases 2740
 ```
 
+Sample output below is a real run of this tool on a **tiny made-up corpus**
+(95 cases, 3 categories, a fictional `demo-scanner`) — it shows the shape, not
+anyone's score. Reproduce it with `python docs/make_readme_sample.py`:
+
 ```
 ==========================================================================
-OWASP Benchmark 评测结果  ·  semgrep.sarif
+OWASP Benchmark 评测结果  ·  demo.sarif
 ==========================================================================
 category             TP     FP     FN     TN |     TPR     FPR
 --------------------------------------------------------------------------
-cmdi                  4      2      0     21 |  100.0%    8.7%
-pathtraver           10      5      1     17 |   90.9%   22.7%
-sqli                 12      0      1     24 |   92.3%    0.0%
-...
+cmdi                 10      2      2     20 |   83.3%    9.1%
+pathtraver            8      3      0     21 |  100.0%   12.5%
+sqli                  5      0      1     23 |   83.3%    0.0%
 --------------------------------------------------------------------------
-总体: TP=1415 FP=0 FN=0 TN=1325
-TPR=100.0%  FPR=0.0%  score=100.0%
+总体: TP=23 FP=5 FN=3 TN=64
+TPR=88.5%  FPR=7.2%  score=81.2%
 ```
+
+Every row's TPR/FPR is computed from that row's own TP/FP/FN/TN, and the totals
+are the sum of the rows — the thing most published SAST tables quietly fail.
 
 ## Why another one
 

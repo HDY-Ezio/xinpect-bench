@@ -1,0 +1,76 @@
+name: uptime
+
+# 从 GitHub 机房盯煋鉴官网：机器死机、断网、磁盘满到服务停、nginx 挂，
+# 这里都会红，GitHub 会自动给仓库关注者发失败邮件。
+# 关键点：看门的人不在我们自己机器上，机器死了它照样能叫。
+#
+# 判据不只看状态码——502/503 的壳子也可能回 200，所以还要看内容特征。
+# 跨洋链路会抖，所以连续三轮、每轮间隔 20 秒，任何一轮全通就算健康。
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uptime-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: 探测官网三个入口
+        run: |
+          set -u
+          BASE="https://xinpect.xingwangzhineng.com"
+
+          check_home() {
+            body=$(curl -sS --max-time 25 -w '\n%{http_code}' "$BASE/" 2>/dev/null) || return 1
+            code=$(printf '%s' "$body" | tail -n1)
+            [ "$code" = "200" ] || { echo "首页状态码 $code"; return 1; }
+            printf '%s' "$body" | grep -q '煋鉴 Xinpect' || { echo "首页没有品牌字样（可能是错误页）"; return 1; }
+            return 0
+          }
+
+          check_health() {
+            body=$(curl -sS --max-time 25 -w '\n%{http_code}' "$BASE/health" 2>/dev/null) || return 1
+            code=$(printf '%s' "$body" | tail -n1)
+            [ "$code" = "200" ] || { echo "健康接口状态码 $code"; return 1; }
+            printf '%s' "$body" | grep -q 'xinpect-website' || { echo "健康接口认不出身份"; return 1; }
+            printf '%s' "$body" | grep -q '"status":"ok"' || { echo "健康接口自报不 ok"; return 1; }
+            return 0
+          }
+
+          check_login() {
+            code=$(curl -sS -o /dev/null --max-time 25 -w '%{http_code}' "$BASE/login" 2>/dev/null) || return 1
+            [ "$code" = "200" ] || { echo "登录页状态码 $code"; return 1; }
+            return 0
+          }
+
+          ok=0
+          for attempt in 1 2 3; do
+            echo "=== 第 $attempt 轮 ==="
+            fail=0
+            check_home   || fail=1
+            check_health || fail=1
+            check_login  || fail=1
+            if [ "$fail" = "0" ]; then
+              ok=1
+              echo "第 $attempt 轮三个入口全通"
+              break
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "本轮有失败，20 秒后重试（跨洋抖动不算故障）"
+              sleep 20
+            fi
+          done
+
+          if [ "$ok" != "1" ]; then
+            echo "::error::煋鉴官网连续三轮探测失败，请立即检查服务器"
+            exit 1
+          fi

@@ -1,10 +1,11 @@
 name: uptime
 
-# 从 GitHub 机房盯煋鉴官网。机器死机、断网、磁盘满到服务停、nginx 挂，
-# 这里都会红，并且直接用邮件叫你——看门的人不在我们自己机器上。
+# 从 GitHub 机房盯煋鉴官网：每 5 分钟探一次首页 / 健康接口 / 登录页。
+# 连续三轮都失败才判定故障——跨洋链路会抖，一次失败不算数。
+# 判定故障后开一张单并 @ 人，GitHub 会立刻把邮件发到被 @ 的人手上。
 #
-# 判据不只看状态码：502/503 的壳子也可能回 200，所以还要看内容特征。
-# 跨洋链路会抖，所以连续三轮、每轮间隔 20 秒，任何一轮全通就算健康。
+# 为什么用开单而不是发邮件：邮件要 SMTP 凭据 -> 要 Secrets -> 要登录网页设。
+# 开单只用 workflow 自带的临时令牌，零额外凭据。而且单子有案可查。
 
 on:
   schedule:
@@ -13,10 +14,11 @@ on:
   push:
     paths:
       - '.github/workflows/uptime.yml'
-      - '.github/scripts/alert_mail.py'
+      - '.github/scripts/probe.py'
 
 permissions:
   contents: read
+  issues: write
 
 concurrency:
   group: uptime-probe
@@ -29,75 +31,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 探测官网三个入口
-        run: |
-          set -u
-          BASE="https://xinpect.xingwangzhineng.com"
-          REASONS="$RUNNER_TEMP/reasons.txt"
-          : > "$REASONS"
-
-          check_home() {
-            body=$(curl -sS --max-time 25 -w '\n%{http_code}' "$BASE/" 2>/dev/null) || { echo "首页连不上" >> "$REASONS"; return 1; }
-            code=$(printf '%s' "$body" | tail -n1)
-            [ "$code" = "200" ] || { echo "首页状态码 $code" >> "$REASONS"; return 1; }
-            printf '%s' "$body" | grep -q '煋鉴 Xinpect' || { echo "首页没有品牌字样（可能是错误页）" >> "$REASONS"; return 1; }
-            return 0
-          }
-
-          check_health() {
-            body=$(curl -sS --max-time 25 -w '\n%{http_code}' "$BASE/health" 2>/dev/null) || { echo "健康接口连不上" >> "$REASONS"; return 1; }
-            code=$(printf '%s' "$body" | tail -n1)
-            [ "$code" = "200" ] || { echo "健康接口状态码 $code" >> "$REASONS"; return 1; }
-            printf '%s' "$body" | grep -q 'xinpect-website' || { echo "健康接口认不出身份" >> "$REASONS"; return 1; }
-            printf '%s' "$body" | grep -q '"status":"ok"' || { echo "健康接口自报不 ok" >> "$REASONS"; return 1; }
-            return 0
-          }
-
-          check_login() {
-            code=$(curl -sS -o /dev/null --max-time 25 -w '%{http_code}' "$BASE/login" 2>/dev/null) || { echo "登录页连不上" >> "$REASONS"; return 1; }
-            [ "$code" = "200" ] || { echo "登录页状态码 $code" >> "$REASONS"; return 1; }
-            return 0
-          }
-
-          ok=0
-          for attempt in 1 2 3; do
-            echo "=== 第 $attempt 轮 ==="
-            : > "$REASONS"
-            fail=0
-            check_home   || fail=1
-            check_health || fail=1
-            check_login  || fail=1
-            if [ "$fail" = "0" ]; then
-              ok=1
-              echo "第 $attempt 轮三个入口全通"
-              break
-            fi
-            cat "$REASONS"
-            if [ "$attempt" -lt 3 ]; then
-              echo "本轮有失败，20 秒后重试（跨洋抖动不算故障）"
-              sleep 20
-            fi
-          done
-
-          if [ "$ok" = "1" ]; then
-            exit 0
-          fi
-
-          echo "::error::煋鉴官网连续三轮探测失败"
-          {
-            echo "## 煋鉴官网失联"
-            echo ""
-            echo "- 探测时间（北京）：$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')"
-            sed 's/^/- /' "$REASONS"
-          } >> "$GITHUB_STEP_SUMMARY"
-          exit 1
-
-      - name: 失败时发邮件
-        if: failure()
+      - name: 探测官网，出事就开单
         env:
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-          ALERT_TO: ${{ secrets.ALERT_TO }}
-        run: python3 .github/scripts/alert_mail.py
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ALERT_MENTION: HDY-Ezio
+        run: python3 .github/scripts/probe.py

@@ -35,6 +35,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ALERT_MENTION: HDY-Ezio
-          PROBE_BASE: https://xinpect-probe-drill.invalid
-          ALERT_NOTE: 本次是演练：故意把探测地址指向不存在的域名，用来验证「真出事时能不能叫醒人」。官网本身正常，不用处理，我会自动关掉这张单。
         run: python3 .github/scripts/probe.py

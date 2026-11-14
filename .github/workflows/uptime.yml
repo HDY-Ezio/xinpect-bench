@@ -13,6 +13,7 @@ on:
   push:
     paths:
       - '.github/workflows/uptime.yml'
+      - '.github/scripts/alert_mail.py'
 
 permissions:
   contents: read
@@ -26,8 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - uses: actions/checkout@v4
+
       - name: 探测官网三个入口
-        id: probe
         run: |
           set -u
           BASE="https://xinpect.xingwangzhineng.com"
@@ -78,18 +80,14 @@ jobs:
           done
 
           if [ "$ok" = "1" ]; then
-            echo "healthy=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          echo "healthy=false" >> "$GITHUB_OUTPUT"
           echo "::error::煋鉴官网连续三轮探测失败"
           {
             echo "## 煋鉴官网失联"
             echo ""
-            echo "探测时间（北京）：$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')"
-            echo ""
-            echo "失败原因："
+            echo "- 探测时间（北京）：$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')"
             sed 's/^/- /' "$REASONS"
           } >> "$GITHUB_STEP_SUMMARY"
           exit 1
@@ -102,41 +100,4 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           ALERT_TO: ${{ secrets.ALERT_TO }}
-        run: |
-          python3 - <<'PY'
-          import os, smtplib, ssl
-          from email.mime.text import MIMEText
-          from email.utils import formataddr
-          from datetime import datetime, timezone, timedelta
-
-          need = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASSWORD', 'ALERT_TO']
-          miss = [k for k in need if not os.environ.get(k)]
-          if miss:
-              print('邮件配置不全，跳过发信：' + ', '.join(miss))
-              raise SystemExit(1)
-
-          now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M:%S')
-          body = f"""探测时间（北京）：{now}
-
-从 GitHub 机房连续三轮访问煋鉴官网都失败：
-- 首页 https://xinpect.xingwangzhineng.com/
-- 健康接口 /health
-- 登录页 /login
-
-可能原因：整台服务器失联、nginx 挂了、证书过期、服务被 OOM 杀掉、磁盘写满。
-详情见 GitHub 运行记录：{os.environ.get('GITHUB_SERVER_URL','')}/{os.environ.get('GITHUB_REPOSITORY','')}/actions
-
-这条邮件由 GitHub 机房发出——即使我们自己的机器死了，它也发得出来。
-"""
-          msg = MIMEText(body, 'plain', 'utf-8')
-          msg['Subject'] = '煋鉴官网失联（外部探测告警）'
-          msg['From'] = formataddr(('煋鉴外部探活', os.environ['SMTP_USER']))
-          msg['To'] = os.environ['ALERT_TO']
-
-          port = int(os.environ['SMTP_PORT'])
-          ctx = ssl.create_default_context()
-          with smtplib.SMTP_SSL(os.environ['SMTP_HOST'], port, timeout=30, context=ctx) as s:
-              s.login(os.environ['SMTP_USER'], os.environ['SMTP_PASSWORD'])
-              s.sendmail(os.environ['SMTP_USER'], [os.environ['ALERT_TO']], msg.as_string())
-          print('告警邮件已发送给 ' + os.environ['ALERT_TO'])
-          PY
+        run: python3 .github/scripts/alert_mail.py

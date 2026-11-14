@@ -123,8 +123,12 @@ def find_open_issue(token, repo):
 
 
 def open_alert(problems, token, repo):
+    note = os.environ.get("ALERT_NOTE", "").strip()
+    head = ["@%s 官网打不开了，需要马上看。" % MENTION, ""]
+    if note:
+        head = ["> " + note, ""] + head
     body = "\n".join(
-        ["@%s 官网打不开了，需要马上看。" % MENTION, ""]
+        head
         + ["- 探测时间（北京）：" + now_cn(), "- 探测点：GitHub 机房（不在我们自己的服务器上）", ""]
         + ["失败原因："]
         + ["- " + p for p in problems]

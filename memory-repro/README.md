@@ -12,14 +12,15 @@
 LongMemEval-S 500 题，**煋思维 473/500 = 94.6%**，同场朴素 RAG **296/500 = 59.2%**，净胜 **+177**。
 答问与判分用的是同一个便宜模型（DeepSeek V4.1 Flash），跑在 2026-11-19。
 
-这个仓只做一件事：**让你独立验证上面这三个数**。
+这份材料只做一件事：**让你独立验证上面这三个数**。
 
 ---
 
 ## 30 秒跑完（零成本，零调用）
 
 ```bash
-git clone <this-repo> && cd <this-repo>
+git clone --depth 1 https://github.com/HDY-Ezio/xinpect-bench
+cd xinpect-bench/memory-repro
 python verify_repro.py data/longmemeval_s_500_answers.json
 ```
 
@@ -45,7 +46,7 @@ python verify_repro.py data/longmemeval_s_500_answers.json
 
 全行业被质疑最多的不是"你答得准不准"，是"**你的判分器是不是在偏袒你自己的答案**"。
 
-这个仓能验它，是因为**答案已经存在文件里了**：每道题的题干、金标、我方答案、RAG 答案都在。
+这份材料能验它，是因为**答案已经存在文件里了**：每道题的题干、金标、我方答案、RAG 答案都在。
 所以复算者**不需要我们的检索代码、不需要数据集、不需要我们的提示串**，只要有判分器就能重判。
 
 ```bash
@@ -146,6 +147,6 @@ Hindsight 被统一口径重跑掉 22 分（94.6 → 72.2）就是先例——
 
 ## 许可
 
-与本仓一致：MIT（见仓库根目录 `LICENSE`）。
+本目录随 [xinpect-bench](../README.md) 一起发布，许可同上：MIT（见仓库根目录 `LICENSE`）。
 `judge.py` 里的判分提示串原样转录自 Memory Tax 论文的参考实现（MIT），
 原文署名保留在该文件头注释里。

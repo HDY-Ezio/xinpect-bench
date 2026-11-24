@@ -208,6 +208,9 @@ you to recompute it, not enough for you to reproduce our answers.
   retrieval: 296/500 (59.2%). Questions, gold answers, both systems' answers and
   the judge are included; the retrieval and evidence-assembly prompts are not.
   **Not a SAST result — nothing in it is comparable to the numbers above.**
+  Mirrored to Gitee for readers in China:
+  <https://gitee.com/xingwangzhineng/xingmind-memory-repro> (the mirror blocks
+  direct download of the data file by its content filter; `git clone` works).
 
 If you recompute one of these and get a different number, tell us and we will post
 the diff as-is, including when it goes against us.

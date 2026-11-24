@@ -8,6 +8,11 @@
 > This folder lives in [xinpect-bench](../README.md) for lack of a better home; it has
 > nothing to do with the SAST benchmark in the rest of that repository.
 
+**两个地址，内容相同。** 国内镜像 <https://gitee.com/xingwangzhineng/xingmind-memory-repro>
+（clone 快；但 Gitee 的内容过滤会挡住 `data/*.json` 的网页直链，返回 451
+`The content may contain violation information`，**`git clone` 不受影响**）。
+**本目录是主源**，两边不一致以这里为准。
+
 **Claim（可被这份材料验）：**
 LongMemEval-S 500 题，**煋思维 473/500 = 94.6%**，同场朴素 RAG **296/500 = 59.2%**，净胜 **+177**。
 答问与判分用的是同一个便宜模型（DeepSeek V4.1 Flash），跑在 2026-11-19。

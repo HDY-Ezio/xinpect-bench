@@ -6,7 +6,8 @@
   - PREF：偏好题，判「是否体现用户偏好」
   - 输出统一要求 {"label": "CORRECT"/"WRONG"}
 
-来源：common/judge/prompts.py（MIT），已转录到本目录 MemoryTax_ref/judge_prompts.py。
+来源：Memory Tax 论文参考实现 common/judge/prompts.py（MIT）。两段提示串原样转录在
+本文件的 `GENERAL` / `PREF` 常量里，措辞未改；要对照原文直接看常量内容即可。
 """
 from __future__ import annotations
 

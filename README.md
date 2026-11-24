@@ -197,6 +197,21 @@ That 0.0% FPR is a Java-benchmark result on a public corpus. It is not a promise
 about your repository — which is why our free tier is called a **triage**
 (初筛), not a full report.
 
+## Other reproduction packs
+
+We publish audit trails, not just scores. When we quote a number from a benchmark
+that is not this one, the trail goes here too — same rule as `bench/`: enough for
+you to recompute it, not enough for you to reproduce our answers.
+
+- [`memory-repro/`](memory-repro/) — a long-term-memory benchmark (LongMemEval-S,
+  500 questions). Our run: **473/500 (94.6%)**; the same answer model with plain
+  retrieval: 296/500 (59.2%). Questions, gold answers, both systems' answers and
+  the judge are included; the retrieval and evidence-assembly prompts are not.
+  **Not a SAST result — nothing in it is comparable to the numbers above.**
+
+If you recompute one of these and get a different number, tell us and we will post
+the diff as-is, including when it goes against us.
+
 ## License
 
 MIT. Use it, fork it, embed it in your commercial product, ship it in your CI.
